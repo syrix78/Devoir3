@@ -8,6 +8,7 @@ import Levenshtein._levenshtein as lv
 from minineedle import NeedlemanWunsch
 from soundex import Soundex
 from LCS import LCS
+import jaro
 #https://stackoverflow.com/questions/29054661/how-to-get-the-max-n-elements/29054704
 import heapq
 
@@ -99,7 +100,7 @@ def candidates(word, type="hamming"):
     elif type == "LCS":
         return (known([word]) or lcs(word) or [word])
     elif type == "Jaro-Wrinkler":
-        return (known([word]) or jaro_w(word) or [word])
+        return (known([word]) or jaro_w(word, True) or [word])
     elif type == "NeedleMan-Wunsch":
         return (known([word]) or needleman_w(word) or [word])
     elif type == "levenshtein":
@@ -216,16 +217,42 @@ def needleman_w(word):
     return nw_candidates
 
 #------------------------- Jaro_Wrinkler -------------------------#
-def jaro_w(word):
+# I think that for Jaro-W, we have two possible choice to choose the best words.
+# The way it works now, is that we have a dict with words ranking from the highest similiarity to the lowest
+# excluding zero.
+# So we have the choice to:
+# - Return the 3 top similarity or
+# - Take like the 10% best words and then in this 10% we take the 3 words that appear the most in the corpus
 
-    nw_candidates = []
+def jaro_w(word, topSimilarity):
+
+    nw_candidates = {}
     for c in freqDict:
-        jw = lv.jaro_winkler(word, c)
-        nw_candidates.append((c, jw))
+        similiarity = jaro.jaro_winkler_metric(word, c)
+        if similiarity > 0:
+            nw_candidates[c] = similiarity
 
-    return nw_candidates
+    if len(nw_candidates) == 0:
+        nw_candidates[word] = 1
 
-def benchmark(test_path, distance="hamming"):
+    sorted_candidates_word_freq = sorted(nw_candidates.items(), key=lambda x: x[1], reverse=True)
+    sorted_candidate_word = []
+
+    for i in range(len(sorted_candidates_word_freq)):
+        sorted_candidate_word.append(sorted_candidates_word_freq[i][0])
+
+    words = []
+
+    if topSimilarity:
+        return sorted_candidate_word[0:min(3, len(sorted_candidate_word)-1)] # Les 3 premiers mots
+    else:
+        sorted_candidate_word = sorted_candidate_word[0:min(3, len(sorted_candidate_word)/10+1)]
+        for i in range(min(len(sorted_candidate_word), 3)):
+            words.append(max(sorted_candidate_word, key=P))
+            sorted_candidate_word.remove(words[i])
+        return words
+
+def benchmark(test_path, distance="Jaro-Wrinkler"):
     tsv_file = open(test_path, encoding="utf8")
     read_tsv = csv.reader(tsv_file, delimiter="\t")
     match_cases = 0
@@ -261,7 +288,15 @@ if __name__ == "__main__":
 
     #print(" ")
     #proba = hamming('thise')
-    proba = levenshtein('reccodmission')
+
+    print("Jaro-Winkler en prenant compte des fréquences de mot")
+    proba = jaro_w('eleppant', True)
+    print("Mots les plus probables: ")
+    for elem in proba:
+        print("- " + elem)
+
+    print("Jaro-Winkler sans prendre compte des fréquences de mot")
+    proba = jaro_w('eleppant', False)
     print("Mots les plus probables: ")
     for elem in proba:
         print("- " + elem)
@@ -276,6 +311,6 @@ if __name__ == "__main__":
     #sound = Soundex()
     #print(sound.compare("reccodmission", "recognition"))s
     #print(jaro.jaro_winkler_metric("reccodmission", "recognition"))
-    print(benchmark("./devoir3-train.txt", "soundex"))
+    print(benchmark("./devoir3-train.txt", "Jaro-Wrinkler"))
 
 
