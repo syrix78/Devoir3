@@ -7,7 +7,6 @@ import numpy as np
 import Levenshtein._levenshtein as lv
 from minineedle import NeedlemanWunsch
 from soundex import Soundex
-from LCS import LCS
 import jaro
 # https://stackoverflow.com/questions/29054661/how-to-get-the-max-n-elements/29054704
 import heapq
