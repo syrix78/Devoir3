@@ -260,9 +260,10 @@ def benchmark(test_path, distance="Jaro-Wrinkler"):
 
     for row in read_tsv:
         elements = row[0].split(" ")
-        best_case = correction(elements[0], distance)
-        best_case = best_case[0]
-        if best_case == elements[-1]:
+        best_cases = correction(elements[0], distance)
+        #best_case = best_cases[0]
+        #if best_case == elements[-1]:
+        if elements[-1] in best_cases:
             match_cases += 1
 
         total_cases += 1
@@ -311,6 +312,6 @@ if __name__ == "__main__":
     #sound = Soundex()
     #print(sound.compare("reccodmission", "recognition"))s
     #print(jaro.jaro_winkler_metric("reccodmission", "recognition"))
-    print(benchmark("./devoir3-train.txt", "Jaro-Wrinkler"))
+    print(benchmark("./devoir3-train.txt", "levenshtein"))
 
 
