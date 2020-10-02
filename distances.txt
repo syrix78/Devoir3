@@ -1,5 +1,5 @@
-Hamming: Déjà implémenté!!!! 35% de cas bon (En prenant le meilleur cas) en 1 min
-Levenshtein (Distance d'édition dans le cours) 12% de cas bon (En prenant le meilleur cas)
+Hamming: Déjà implémenté!!!! 24% de cas bon (En prenant le meilleur cas) en 1 min
+Levenshtein (Distance d'édition dans le cours) 67% de cas bon (En prenant les 3 meilleurs cas)
 Cosinus??? (Appliqué pour les mots????): Trouver comment l'implémenter
 Jaro-Winkler: 11% de cas bon (En prenant le meilleur cas) en 25-30 mins
 Needleman-Wunsch: Trop long. A rouler
