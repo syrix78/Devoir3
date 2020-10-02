@@ -259,7 +259,7 @@ def benchmark(test_path, distance="Jaro-Wrinkler"):
     total_cases = 0
 
     for row in read_tsv:
-        elements = row[0].split(" ")
+        elements = row
         best_cases = correction(elements[0], distance)
         #best_case = best_cases[0]
         #if best_case == elements[-1]:
@@ -291,16 +291,16 @@ if __name__ == "__main__":
     #proba = hamming('thise')
 
     print("Jaro-Winkler en prenant compte des fréquences de mot")
-    proba = jaro_w('eleppant', True)
+    #proba = jaro_w('eleppant', True)
     print("Mots les plus probables: ")
-    for elem in proba:
-        print("- " + elem)
+    #for elem in proba:
+    #    print("- " + elem)
 
     print("Jaro-Winkler sans prendre compte des fréquences de mot")
-    proba = jaro_w('eleppant', False)
-    print("Mots les plus probables: ")
-    for elem in proba:
-        print("- " + elem)
+    #proba = jaro_w('eleppant', False)
+    #print("Mots les plus probables: ")
+   # for elem in proba:
+    #    print("- " + elem)
 
 
     #Lucas Hornung
