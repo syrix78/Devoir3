@@ -1,4 +1,4 @@
-reccodmission   recognition
+reccodmission	recognition
 unpair	unpaired
 oconomic	economic
 accidnts	accidents

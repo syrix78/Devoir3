@@ -263,7 +263,7 @@ def benchmark(test_path, distance="Jaro-Wrinkler"):
         best_cases = correction(elements[0], distance)
         #best_case = best_cases[0]
         #if best_case == elements[-1]:
-        if elements[-1] in best_cases:
+        if elements[1] in best_cases:
             match_cases += 1
 
         total_cases += 1
