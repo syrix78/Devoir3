@@ -15,22 +15,24 @@ import jaro
 import heapq
 
 
-#------------------------- INITIALISATION -------------------------#
+# ------------------------- INITIALISATION -------------------------#
 
 def readTextFile(path):
     text = open(path, "r")
     return text.read()
 
+
 # Read a text file and transform it into an array with 1 word per cell
 def sentenceToWordsArray(text):
     wordArray = re.findall(r'\w+', text.lower())
-    #print(wordArray)
+    # print(wordArray)
+
 
 # Initiate a dictionary containing words for key and their frequence for value
 def initiateDict(lexiquePath):
     lexique = open(lexiquePath, "r", encoding="utf8")
 
-    lineArray = [] # Array containing line of the lexique
+    lineArray = []  # Array containing line of the lexique
 
     for line in lexique:
         lineArray.append(line)
@@ -43,20 +45,22 @@ def initiateDict(lexiquePath):
 
     return freqDict
 
+
 # Dictionnary with format {word: frequence} type {String: int}
 freqDict = initiateDict("./voc-1bwc.txt")
 
-#------------------------- COMMON FUNCTIONS -------------------------#
+# ------------------------- COMMON FUNCTIONS -------------------------#
 
 # From https://norvig.com/spell-correct.html
 def P(word, N=sum(freqDict.values())):
-    #Modified here because if word is not present, il crashes
+    # Modified here because if word is not present, il crashes
     if word in freqDict:
         return freqDict[word] / N
     else:
         return 0
 
-#Modified P in order to take into account distances with scores (Ex: Jaro-Winkler)
+
+# Modified P in order to take into account distances with scores (Ex: Jaro-Winkler)
 def P_score(word, N=sum(freqDict.values())):
     # Word[0] is the candidate
     # Word[1] is the score
@@ -65,6 +69,7 @@ def P_score(word, N=sum(freqDict.values())):
     else:
         return 0
 
+
 # From https://norvig.com/spell-correct.html
 def correction(word, type):
     "Most probable spelling correction for word."
@@ -72,7 +77,7 @@ def correction(word, type):
     candidatesSet = candidates(word, type)
 
     if len(candidatesSet) > 0 and len(np.shape(candidatesSet)) == 2:
-        #Takes the 3 best candidates (optimised)
+        # Takes the 3 best candidates (optimised)
         corrections = heapq.nlargest(3, candidatesSet, key=P_score)
         """
         for i in range(min(3, len(candidatesSet))):
@@ -92,11 +97,13 @@ def correction(word, type):
 
     return corrections
 
+
 # From https://norvig.com/spell-correct.html
-def candidates(word, type="hamming", topSimilarity=True):
+def candidates(word, type="hamming", topSimilarity=False):
     "Generate possible spelling corrections for word."
     if type == "hamming":
-        return (known([word]) or known(hammingOneChange(word)) or known(hammingTwoChanges(word)) or [word]) #This is not hamming???
+        return (known([word]) or known(hammingOneChange(word)) or known(hammingTwoChanges(word)) or [
+            word])  # This is not hamming???
     elif type == "soundex":
         return (known([word]) or soundex(word) or [word])
     elif type == "LCS":
@@ -110,6 +117,7 @@ def candidates(word, type="hamming", topSimilarity=True):
     else:
         return 0
 
+
 # From https://norvig.com/spell-correct.html
 # The argument words is an array containing strings and this function check whether a string exist in the dict or not
 def known(words):
@@ -117,7 +125,7 @@ def known(words):
     return set(w for w in words if w in freqDict)
 
 
-#------------------------- HAMMING -------------------------#
+# ------------------------- HAMMING -------------------------#
 
 # From https://norvig.com/spell-correct.html
 # Create a set of every possible words with just one letter difference
@@ -129,11 +137,13 @@ def hammingOneChange(word):
     replaces = [L + c + R[1:] for L, R in splits if R for c in letters]
     return replaces
 
+
 # From https://norvig.com/spell-correct.html
 # Create a set of every possible words with two letters difference
 def hammingTwoChanges(word):
     "All edits that are two edits away from `word`."
     return (e2 for e1 in hammingOneChange(word) for e2 in hammingOneChange(e1))
+
 
 def hamming(word):
     result = correction(word, "hamming")
@@ -141,16 +151,15 @@ def hamming(word):
     return result
 
 
-#------------------------- NEEDLEMAN WUNSCH -------------------------#
+# ------------------------- NEEDLEMAN WUNSCH -------------------------#
 
 def needleman_wunsch(word_x, word_y):
-
     T = np.zeros((len(word_x), len(word_y)))
 
     return 0
 
 
-#------------------------- LEVENSHTEIN -------------------------#
+# ------------------------- LEVENSHTEIN -------------------------#
 
 # Imported from https://github.com/ztane/python-Levenshtein/
 # Documentation can be find https://rawgit.com/ztane/python-Levenshtein/master/docs/Levenshtein.html
@@ -162,7 +171,7 @@ def levenshteinClosest(word):
     operations = 1
     searching = True
     candidateArray = []
-    while(operations < len(word)/2 and searching):
+    while (operations < len(word) / 2 and searching):
         for w in freqDict:
             if lv.distance(word, w) == operations:
                 candidateArray.append(w)
@@ -186,9 +195,9 @@ def levenshtein(word):
 
 print(lv.distance("Voiture", "Moteur"))
 
-#------------------------- SOUNDEX -------------------------#
-def soundex(word):
 
+# ------------------------- SOUNDEX -------------------------#
+def soundex(word):
     word = word.capitalize()
     sound_candidates = []
     soundexScore = Soundex().soundex
@@ -202,13 +211,13 @@ def soundex(word):
         sound_candidates.remove(words[i])
     return words
     #    s = sound.compare(word, c)
-     #   if s == 1 or s == 0:
+    #   if s == 1 or s == 0:
 
-    #return sound_candidates
+    # return sound_candidates
 
-#------------------------- LCS -------------------------#
+
+# ------------------------- LCS -------------------------#
 def lcs(word):
-
     lcs_candidates = []
     for c in freqDict:
         lcs = LCS(word, c)
@@ -216,9 +225,9 @@ def lcs(word):
 
     return lcs_candidates
 
-#------------------------- Needleman Wunsch -------------------------#
-def needleman_w(word):
 
+# ------------------------- Needleman Wunsch -------------------------#
+def needleman_w(word):
     nw_candidates = []
     for c in freqDict:
         nw = NeedlemanWunsch(word, c)
@@ -227,7 +236,8 @@ def needleman_w(word):
 
     return nw_candidates
 
-#------------------------- Jaro_Wrinkler -------------------------#
+
+# ------------------------- Jaro_Wrinkler -------------------------#
 # I think that for Jaro-W, we have two possible choice to choose the best words.
 # The way it works now, is that we have a dict with words ranking from the highest similiarity to the lowest
 # excluding zero.
@@ -236,7 +246,6 @@ def needleman_w(word):
 # - Take like the 10% best words and then in this 10% we take the 3 words that appear the most in the corpus
 
 def jaro_w(word, topSimilarity):
-
     nw_candidates = {}
     for c in freqDict:
         similiarity = jaro.jaro_winkler_metric(word, c)
@@ -257,14 +266,15 @@ def jaro_w(word, topSimilarity):
         words = []
 
         if topSimilarity:
-            return sorted_candidate_word[0:min(3, len(sorted_candidate_word)-1)] # Les 3 premiers mots
+            return sorted_candidate_word[0:min(3, len(sorted_candidate_word) - 1)]  # Les 3 premiers mots
         else:
             # sorted_candidate_word = sorted_candidate_word[0:min(3, len(sorted_candidate_word)/10+1)]
-            sorted_candidate_word = sorted_candidate_word[0:min(3, len(sorted_candidate_word)-1)]
+            sorted_candidate_word = sorted_candidate_word[0:min(3, len(sorted_candidate_word) - 1)]
             for i in range(min(len(sorted_candidate_word), 3)):
                 words.append(max(sorted_candidate_word, key=P))
                 sorted_candidate_word.remove(words[i])
             return words
+
 
 def benchmark(test_path, distance="Jaro-Wrinkler"):
     tsv_file = open(test_path, encoding="utf8")
@@ -276,9 +286,9 @@ def benchmark(test_path, distance="Jaro-Wrinkler"):
     for row in read_tsv:
         elements = row
         best_cases = correction(elements[0], distance)
-        #best_case = best_cases[0]
-        #if best_case == elements[-1]:
-        #testVl = elements[-1]
+        # best_case = best_cases[0]
+        # if best_case == elements[-1]:
+        # testVl = elements[-1]
         if elements[1] in best_cases:
             match_cases += 1
         if elements[1] == best_cases[0]:
@@ -288,9 +298,11 @@ def benchmark(test_path, distance="Jaro-Wrinkler"):
         print(total_cases)
 
     tsv_file.close()
-    return (match_cases/total_cases, match_1_cases/total_cases)
+    return (match_cases / total_cases, match_1_cases / total_cases)
+
 
 if __name__ == "__main__":
+
     #text = readTextFile("/Users/quentinwolak/PycharmProjects/devoir3/test.txt")
 
     #print(freqDict["aaa-rating"])
@@ -306,19 +318,19 @@ if __name__ == "__main__":
     #    print("- " + elem)
 
     #print(" ")
-    proba = levenshtein('begolf')
+    #proba = levenshtein('begolf')
 
     #print("Jaro-Winkler en prenant compte des fréquences de mot")
     #proba = jaro_w('backgrounging', True)
-    print("Mots les plus probables: ")
-    for elem in proba:
-        print("- " + elem)
+    #print("Mots les plus probables: ")
+    #for elem in proba:
+    #    print("- " + elem)
 
-    print("Jaro-Winkler sans prendre compte des fréquences de mot")
-    proba = jaro_w('beholf', False)
-    print("Mots les plus probables: ")
-    for elem in proba:
-        print("- " + elem)
+    #print("Jaro-Winkler sans prendre compte des fréquences de mot")
+    #proba = jaro_w('beholf', False)
+    #print("Mots les plus probables: ")
+    #for elem in proba:
+    #    print("- " + elem)
 
 
     #Lucas Hornung
@@ -335,7 +347,8 @@ if __name__ == "__main__":
     #print(benchmark("./devoir3-train.txt", "soundex"))
 
     #Running Benchmarks here
-    distances = ["hamming", "levenshtein", "Jaro-Winkler", "NeedleMan-Wunsch", "soundex", "LCS"]
+
+    distances = ["hamming", "NeedleMan-Wunsch", "soundex", "LCS"]
 
     for distance in distances:
         print("Calculating " + distance + " distance benchmark" + "\n")
@@ -348,3 +361,4 @@ if __name__ == "__main__":
         file1.write("On 3 best candidates: " + str(bench_results[0]) + "\n")
         file1.write("Run time (In seconds): " + str(elapsed_time) + "\n")
         file1.close()
+    
