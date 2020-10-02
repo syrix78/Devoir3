@@ -334,6 +334,7 @@ if __name__ == "__main__":
 
     #print(benchmark("./devoir3-train.txt", "soundex"))
 
+    #Running Benchmarks here
     distances = ["hamming", "levenshtein", "Jaro-Winkler", "NeedleMan-Wunsch", "soundex", "LCS"]
 
     for distance in distances:
